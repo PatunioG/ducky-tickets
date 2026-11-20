@@ -1,0 +1,54 @@
+DUCKY TICKETS v3
+Abre index.html con Chrome o usa VS Code + Live Server.
+Archivos: index.html, styles.css, app.js, mapa-referencia.png.
+
+CAMBIOS:
+- Paleta azul marino + azul eléctrico + celeste (se eliminó el fondo café).
+- Almacenamiento nuevo v3: inicia con el evento Cuarto Azul Aitana Roblox Tour publicado, sin reutilizar estados viejos de pruebas.
+- Buscador funcional con botón Buscar y botón × para limpiar.
+- Catálogo de eventos publicados y tarjetas clicables.
+- Cada evento abre su detalle y mapa SVG interactivo.
+- Admin: crear, editar, ocultar/mostrar sin cambiar la fase, eliminar, liberar preventa y liberar venta general.
+- Crear oculto antes de preventa; al liberar preventa/venta general se publica automáticamente.
+- Exportación CSV de asistentes.
+NOTA: demo local en LocalStorage. No comparte datos entre dispositivos. El código de colores no protege realmente el panel; para producción se requiere backend y autenticación real, más validación de asistencia y cupos en servidor.
+
+Actualización 3.1: el selector de ubicación ahora muestra 'Todo Roblox'. El botón Administración abre el acceso de administración con la secuencia de cuatro colores configurada.
+\nActualización 3.2: se corrigió la interacción del acceso de administración usando delegación de eventos; el botón Administración y los botones de color responden a clics de forma más fiable. Al abrir el ZIP nuevo, extrae en una carpeta distinta para evitar usar archivos viejos.\n
+VERSIÓN 3.3: el acceso de Administración fue reescrito con listeners directos e independientes. Si ya tenías la carpeta 3.2, extrae esta versión completa en otra carpeta y abre el index.html de DUCKY_TICKETS_V3_3. No mezcles archivos.
+
+VERSIÓN 3.4: el acceso de administración se movió a un botón flotante fijo en la esquina inferior derecha. Se añadió un controlador independiente de clics para abrir el modal y gestionar los cuatro colores, separado del botón del encabezado.
+
+VERSIÓN 3.5 — CORRECCIÓN IMPORTANTE: se corrigió el orden de inicialización en app.js. La base de datos intentaba cargarse antes de que existiera el evento inicial (starter), provocando un error JavaScript que dejaba vacío el panel de administración y desactivaba las funciones. También se normalizan registros antiguos para que no rompan el resumen ni la lista de asistentes. Extrae esta versión completa en una carpeta nueva.
+
+
+DUCKY TICKETS 4.0 — FUNCIONES NUEVAS
+
+1) HORARIOS Y CONTADOR
+- Al crear un evento puedes indicar fecha/hora de preventa y venta general.
+- Selecciona "Publicar con horarios programados" para que el evento aparezca desde antes.
+- El contador indica cuánto falta para la siguiente apertura.
+- Al llegar a cero, el visitante entra a una fila virtual de demostración (12 segundos) antes de elegir accesos.
+- La fase pasa de preventa a venta general automáticamente según los horarios del dispositivo.
+
+2) RECINTOS
+- En Administración > Recintos puedes crear, editar y eliminar recintos.
+- Datos: nombre, promotora, estado, capacidad, URL del juego, descripción, clave Staff y precio especial.
+- "Editar mapa" abre un diseñador por cuadrícula.
+- Herramientas: amarillo disponible, naranja ocupado, negro escenario, gris Staff/Producción y gris oscuro no disponible/vacío.
+- Guarda el recinto y asígnalo a un evento desde el campo Recinto.
+
+3) ACCESO STAFF
+- El acceso Staff/Producción es separado del registro normal y requiere la clave que configuró el administrador para el recinto.
+- Permite seleccionar los asientos grises de Staff en el mapa.
+- El precio especial se muestra como dato de configuración; esta versión es una demostración local y no procesa pagos.
+
+IMPORTANTE
+- Los datos se guardan en el navegador de este equipo.
+- La fila virtual es una simulación visual, no una fila compartida entre visitantes.
+- Las claves, roles y disponibilidad local no son seguridad real. Para abrir al público, conecta un backend con autenticación y reservas atómicas (por ejemplo, Firebase/Supabase).
+- El mapa de recinto agrupa asientos disponibles por fila (A, B, C...) para la selección de sección del prototipo.
+
+ACTUALIZACIÓN 4.0.1: el mapa personalizado ahora permite seleccionar cuadritos de asiento individualmente (hasta cuatro), y cada reserva ocupa exactamente los asientos elegidos. Los asientos Staff se reservan por separado tras iniciar sesión con la clave del recinto.
+
+ACTUALIZACIÓN 4.0.2 — FILA VIRTUAL: la fila de demostración ahora inicia en el número 50 y baja de uno en uno cada segundo hasta llegar a 0. Al terminar, se habilita la selección de accesos.

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#064bdc"><title>Ducky Tickets | Eventos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="ticket-logo" href="#" id="homeLink">DUCKY<span>tickets</span><sup>®</sup></a>
+  <nav><a href="#events">Conciertos y eventos</a><a href="#how">Cómo funciona</a></nav>
+</header>
+<div class="searchbar"><div class="search-inner"><label>UBICACIÓN<strong>Todo Roblox</strong></label><label>FECHAS<strong>Todos los eventos</strong></label><input id="eventSearch" placeholder="Buscar artista, evento o experiencia" autocomplete="off"><button id="searchBtn">Buscar</button><button id="clearSearch" type="button" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">×</button></div></div>
+
+<main>
+<section class="event-market" id="events">
+  <div class="market-heading"><div><span class="eyebrow">DUCKY PRODUCTIONS PRESENTA</span><h1>ENCUENTRA TU <em>PRÓXIMO SHOW</em></h1><p>Experiencias digitales, conciertos y eventos especiales.</p></div><div class="market-count" id="eventCount">EVENTOS DISPONIBLES</div></div>
+  <div class="event-grid" id="eventGrid"></div>
+  <div class="empty-events hidden" id="emptyEvents">No hay eventos visibles en este momento. Vuelve pronto para descubrir los próximos shows.</div>
+</section>
+<section class="how" id="how"><span class="eyebrow">DUCKY TICKETS</span><h2>Tu acceso, en unos pasos.</h2><div class="how-grid"><article><b>01</b><h3>Elige tu evento</h3><p>Explora los eventos disponibles y entra al que te interesa.</p></article><article><b>02</b><h3>Selecciona tus lugares</h3><p>Elige una sección habilitada y registra hasta cuatro usuarios de Roblox.</p></article><article><b>03</b><h3>Confirma gratis</h3><p>Todos los accesos disponibles en esta plataforma cuestan $0.</p></article></div></section>
+</main>
+<footer><b>DUCKY PRODUCTIONS</b><span>DUCKY TICKETS · Accesos gratuitos</span><small>© <span id="year"></span></small></footer>
+
+<!-- Vista detalle de evento -->
+<section class="event-detail hidden" id="eventDetail">
+ <div class="detail-top"><button class="back-btn" id="backToEvents">← TODOS LOS EVENTOS</button><span class="eyebrow">DETALLES DEL EVENTO</span></div>
+ <div class="detail-hero" id="detailHero"></div>
+ <div class="detail-content">
+  <div class="detail-info"><span class="eyebrow">DUCKY PRODUCTIONS</span><h1 id="detailTitle"></h1><p id="detailDescription"></p><div class="detail-date" id="detailDate"></div><div id="phaseNotice" class="phase-notice"></div></div>
+  <div class="booking-column"><div class="queue-gate" id="queueGate"></div><div class="booking-panel hidden" id="bookingPanel">
+   <span class="eyebrow">RESERVA TUS ACCESOS</span><h2>Selecciona tu sección</h2>
+   <p class="panel-hint">Toca una sección verde, amarilla o azul en el mapa.</p>
+   <div class="seat-map-wrap">
+    <svg id="seatMap" viewBox="0 0 760 470" role="img" aria-label="Mapa interactivo de secciones del auditorio">
+     <defs><filter id="seatShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#15233b" flood-opacity=".15"/></filter></defs>
+     <path d="M80 45 Q380 -30 680 45 L720 335 Q690 410 610 420 L150 420 Q70 410 40 335Z" fill="#f3f5f8"/>
+     <path d="M270 382 L490 382 L520 448 L240 448Z" fill="#d7dbe1"/><text x="380" y="427" text-anchor="middle" class="stage-label">ESCENARIO</text>
+     <g id="mapSections"></g>
+    </svg>
+   </div>
+   <div class="map-legend"><span><i class="dot green"></i>Verde</span><span><i class="dot yellow"></i>Amarillo</span><span><i class="dot blue"></i>Azul</span><span><i class="dot unavailable"></i>No disponible</span></div>
+   <div class="selected-info" id="selectedInfo">Ninguna sección seleccionada</div>
+   <div class="quantity-control"><div><b>Cantidad de accesos</b><small>Máximo 4 por reserva</small></div><div class="stepper"><button id="qtyMinus">−</button><strong id="qtyValue">1</strong><button id="qtyPlus">+</button></div></div>
+   <div class="free-total"><span>TOTAL</span><strong>$0.00 <small>MXN</small></strong></div>
+   <button class="cta full" id="startBooking" disabled>CONTINUAR CON MI RESERVA →</button>
+   <button type="button" class="outline staff-login-trigger" id="staffLoginTrigger">Acceso Staff / Producción</button><p class="small-note">Todos los accesos generales son gratuitos. Necesitarás un usuario de Roblox por boleto.</p>
+  </div></div>
+ </div>
+</section>
+
+<!-- Checkout -->
+<div class="modal hidden" id="checkoutModal"><div class="modal-card"><button class="x-close" data-close="checkoutModal">×</button><span class="eyebrow">ÚLTIMO PASO</span><h2>REGISTRA TUS <em>USUARIOS</em></h2><p id="checkoutSummary" class="muted"></p><div id="usernameFields"></div><div id="checkoutError" class="error"></div><button class="cta full" id="confirmBooking">CONFIRMAR ACCESOS GRATUITOS</button></div></div>
+<div class="modal hidden" id="successModal"><div class="modal-card success"><div class="success-check">✓</div><span class="eyebrow">REGISTRO COMPLETADO</span><h2>¡TUS ACCESOS ESTÁN LISTOS!</h2><p id="successMessage" class="muted"></p><div id="successCodes" class="codes"></div><button class="cta full" data-close="successModal">VOLVER AL EVENTO</button></div></div>
+
+<div class="modal hidden" id="staffLoginModal"><div class="modal-card"><button class="x-close" data-close="staffLoginModal">×</button><span class="eyebrow">ACCESO DIFERENCIADO</span><h2>STAFF / PRODUCCIÓN</h2><p class="muted">Ingresa la clave proporcionada por la producción del recinto.</p><label class="username-field">CLAVE DE STAFF<input id="staffAccessCode" type="password" autocomplete="off"></label><div class="error" id="staffLoginError"></div><button class="cta full" id="staffLoginSubmit">INICIAR SESIÓN STAFF</button></div></div><!-- Admin login -->
+<div class="modal hidden" id="adminLoginModal" aria-hidden="true"><div class="modal-card login-card"><button class="x-close" data-close="adminLoginModal">×</button><span class="eyebrow">DUCKY PRODUCTIONS</span><h2>ACCESO <em>ADMINISTRADOR</em></h2><div class="color-slots" id="colorSlots"><i></i><i></i><i></i><i></i></div><div class="color-pad"><button type="button" class="color-key yellow-key" data-color="yellow" aria-label="Color"></button><button type="button" class="color-key orange-key" data-color="orange" aria-label="Color"></button><button type="button" class="color-key blue-key" data-color="blue" aria-label="Color"></button><button type="button" class="color-key green-key" data-color="green" aria-label="Color"></button></div><div id="adminError" class="error"></div><button type="button" id="clearColors" class="clear-btn">Borrar selección</button></div></div>
+
+<!-- Admin app -->
+<div class="admin-app hidden" id="adminApp" style="display:none">
+ <aside class="admin-sidebar"><div class="admin-brand">DUCKY<span>ADMIN</span></div><button class="admin-tab active" data-tab="dashboard">▦ <span>Resumen</span></button><button class="admin-tab" data-tab="events">✦ <span>Eventos</span></button><button class="admin-tab" data-tab="attendees">♙ <span>Asistentes</span></button><button class="admin-tab" data-tab="venues">▦ <span>Recintos</span></button><button class="admin-tab" data-tab="settings">⚙ <span>Configuración</span></button><button id="exitAdmin" class="exit-admin">← Volver al sitio</button></aside>
+ <div class="admin-main"><div class="admin-top"><div><span class="eyebrow">CENTRO DE CONTROL</span><h1 id="adminTitle">Resumen</h1></div><span class="system-live">● SISTEMA ACTIVO</span></div>
+  <section class="admin-page active" id="tab-dashboard"><div class="stats" id="stats"></div><div class="admin-box"><div class="box-head"><div><span class="eyebrow">ACTIVIDAD RECIENTE</span><h2>Últimos registros</h2></div><button class="outline" data-goto="attendees">Ver asistentes</button></div><div id="recentRows"></div></div></section>
+  <section class="admin-page" id="tab-events">
+   <div class="admin-box"><div class="box-head"><div><span class="eyebrow">GESTIÓN DE EVENTOS</span><h2 id="eventFormTitle">Crear evento</h2><p>Crea el evento como oculto y decide cuándo abrir la preventa o venta general.</p></div></div>
+    <form id="eventForm" class="event-form"><input type="hidden" name="id"><label>Nombre del evento<input name="name" required maxlength="100" placeholder="Nombre del evento"></label><label>Fecha del evento<input name="date" type="date" required></label><label>Inicio de preventa<input name="presaleAt" type="datetime-local"></label><label>Inicio de venta general<input name="generalAt" type="datetime-local"></label><label class="wide">Descripción<textarea name="description" rows="3" required placeholder="Descripción del evento"></textarea></label><label class="wide">Portada · URL de imagen<input name="cover" type="url" placeholder="https://..."></label><label>Boletos por sección<input name="capacity" type="number" min="1" max="500" value="20" required></label><label>Recinto<select name="venueId" id="eventVenueSelect"><option value="">Mapa estándar Ducky</option></select></label><label>Publicación inicial<select name="phase"><option value="hidden">Guardar oculto</option><option value="scheduled">Publicar con horarios programados</option><option value="presale">Publicar y abrir preventa ahora</option><option value="general">Publicar y abrir venta general ahora</option></select></label><div class="wide form-actions"><button class="cta" type="submit" id="saveEventBtn">GUARDAR EVENTO</button><button class="outline hidden" type="button" id="cancelEdit">Cancelar edición</button></div></form>
+   </div>
+   <div class="admin-box"><div class="box-head"><div><span class="eyebrow">CATÁLOGO</span><h2>Todos los eventos</h2></div></div><div id="adminEventList"></div></div>
+  </section>
+  <section class="admin-page" id="tab-venues">
+   <div class="admin-box"><div class="box-head"><div><span class="eyebrow">INFRAESTRUCTURA</span><h2 id="venueFormTitle">Crear recinto</h2><p>Administra recintos y diseña sus mapas asiento por asiento.</p></div></div>
+    <form id="venueForm" class="event-form">
+     <input type="hidden" name="id">
+     <label>Nombre del recinto<input name="name" required maxlength="100" placeholder="Ej. Estadio Ducky"></label>
+     <label>Promotora del recinto<input name="promoter" required maxlength="100" placeholder="Ej. Ducky Productions"></label>
+     <label>Estado del recinto<select name="status"><option value="active">Activo</option><option value="renovation">En remodelación</option><option value="closed">Cerrado permanentemente</option></select></label>
+     <label>Capacidad total<input name="capacity" type="number" min="1" max="5000" value="240" required></label>
+     <label class="wide">Enlace del juego oficial<input name="gameLink" type="url" placeholder="https://www.roblox.com/games/..."></label>
+     <label class="wide">Descripción del recinto<textarea name="description" rows="2" placeholder="Describe el recinto"></textarea></label>
+     <label>Clave Staff / Producción<input name="staffCode" type="text" placeholder="Clave diferente a clientes"></label>
+     <label>Precio especial Staff (MXN)<input name="staffPrice" type="number" min="0" step="0.01" value="0"></label>
+     <label>Filas de la cuadrícula<input name="rows" type="number" min="4" max="30" value="12"></label>
+     <label>Columnas de la cuadrícula<input name="cols" type="number" min="4" max="36" value="20"></label>
+     <div class="wide form-actions"><button class="cta" type="submit" id="saveVenueBtn">GUARDAR RECINTO</button><button class="outline" type="button" id="openVenueEditor">EDITAR MAPA</button><button class="outline hidden" type="button" id="cancelVenueEdit">Cancelar edición</button></div>
+    </form>
+    <div id="venueMapEditor" class="venue-map-editor hidden">
+     <div class="venue-editor-head"><div><span class="eyebrow">DISEÑADOR DE RECINTO</span><h2>Mapa por cuadrícula</h2><p>Elige una herramienta y pinta los cuadritos del recinto.</p></div><div class="venue-editor-tools">
+      <button type="button" class="paint-tool active" data-paint="available">Amarillo · Asiento disponible</button>
+      <button type="button" class="paint-tool" data-paint="occupied">Naranja · Ocupado</button>
+      <button type="button" class="paint-tool" data-paint="stage">Negro · Escenario</button>
+      <button type="button" class="paint-tool" data-paint="staff">Gris · Staff / Producción</button>
+      <button type="button" class="paint-tool" data-paint="blocked">Gris oscuro · No disponible / vacío</button>
+     </div></div>
+     <div id="venueGridEditor" class="venue-grid-editor"></div>
+     <p class="small-note">Cada cuadrito representa un asiento o espacio. Los asientos disponibles se agrupan por fila para el sistema de reservas.</p>
+    </div>
+   </div>
+   <div class="admin-box"><div class="box-head"><div><span class="eyebrow">RECINTOS REGISTRADOS</span><h2>Todos los recintos</h2></div></div><div id="venueList"></div></div>
+  </section>
+  <section class="admin-page" id="tab-attendees"><div class="admin-box"><div class="box-head"><div><span class="eyebrow">BASE DE REGISTROS</span><h2>Usuarios de Roblox</h2><p>Lista de usuarios y sección asignada para registrarlos en Roblox.</p></div><button class="outline" id="exportCsv">Exportar CSV ↓</button></div><div class="table-tools"><input id="attendeeSearch" placeholder="Buscar usuario, evento o sección"><span id="attendeeCount"></span></div><div class="table-wrap"><table><thead><tr><th>USUARIO ROBLOX</th><th>EVENTO</th><th>SECCIÓN</th><th>REGISTRO</th><th>SHOWS</th></tr></thead><tbody id="attendeeTable"></tbody></table></div></div></section>
+  <section class="admin-page" id="tab-settings"><div class="admin-box"><span class="eyebrow">CONFIGURACIÓN</span><h2>Plataforma de demostración</h2><p>Los datos se guardan localmente en este navegador. Para uso público real, conecta una base de datos y autenticación de administrador en servidor.</p><div class="warning">La secuencia de colores no es seguridad real: se encuentra en el JavaScript. No publiques esta demo con datos sensibles.</div><button class="danger" id="resetDemo">Restablecer datos de demostración</button></div></section>
+ </div>
+</div>
+<script src="app.js"></script>
+<script src="enhancements.js"></script>
+<button type="button" id="adminFab" class="admin-fab">⚙ ADMINISTRACIÓN</button>
+<script>
+(function(){
+  const sequence = ["yellow","orange","yellow","orange"];
+  let entered = [];
+  function byId(id){ return document.getElementById(id); }
+  function showLogin(){
+    entered=[];
+    const modal=byId("adminLoginModal");
+    if(!modal) return;
+    modal.classList.remove("hidden");
+    modal.style.display="grid";
+    modal.setAttribute("aria-hidden","false");
+    byId("adminError").textContent="";
+    byId("colorSlots").querySelectorAll("i").forEach(slot=>{slot.style.background="transparent";slot.classList.remove("filled");});
+  }
+  function paint(){
+    byId("colorSlots").querySelectorAll("i").forEach((slot,i)=>{slot.style.background=entered[i]||"transparent";slot.classList.toggle("filled",!!entered[i]);});
+  }
+  function openAdmin(){
+    const modal=byId("adminLoginModal"), app=byId("adminApp");
+    modal.classList.add("hidden"); modal.style.display="none"; modal.setAttribute("aria-hidden","true");
+    app.classList.remove("hidden"); app.style.display="grid";
+    if(typeof renderAdmin === "function") renderAdmin();
+    entered=[];
+  }
+  document.addEventListener("click",function(ev){
+    const fab=ev.target.closest("#adminFab");
+    if(fab){ev.preventDefault();showLogin();return;}
+    const key=ev.target.closest("#adminLoginModal .color-key");
+    if(key){
+      ev.preventDefault(); if(entered.length>=4)return;
+      entered.push(key.dataset.color); paint();
+      if(entered.length===4){
+        if(entered.every((c,i)=>c===sequence[i])) openAdmin();
+        else {byId("adminError").textContent="Secuencia incorrecta. Inténtalo de nuevo.";entered=[];setTimeout(paint,650);}
+      }
+      return;
+    }
+    if(ev.target.closest("#clearColors")){entered=[];paint();byId("adminError").textContent="";return;}
+    if(ev.target.closest("#exitAdmin")){const app=byId("adminApp");app.classList.add("hidden");app.style.display="none";}
+    if(ev.target.closest('#adminLoginModal [data-close="adminLoginModal"]')){const m=byId("adminLoginModal");m.classList.add("hidden");m.style.display="none";m.setAttribute("aria-hidden","true");}
+  },true);
+  window.addEventListener("DOMContentLoaded",function(){
+    const old=byId("openAdmin"); if(old) old.style.display="none";
+  });
+})();
+</script>
+
+</body></html>
