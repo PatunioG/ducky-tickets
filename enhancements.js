@@ -95,28 +95,34 @@
     if(queuePassed[key]){
       gate.classList.add("hidden");$("#bookingPanel").classList.remove("hidden");return;
     }
-    gate.innerHTML=`<span class="eyebrow">DUCKY VIRTUAL QUEUE</span><h2>La venta está abierta</h2><p>Antes de seleccionar tus accesos, entra a la fila virtual de demostración.</p><button class="cta" id="joinQueueBtn">ENTRAR A LA FILA VIRTUAL</button><div id="queueProgress" class="queue-progress hidden"><div class="queue-track"><i id="queueBar"></i></div><strong id="queueStatus">Preparando tu lugar…</strong><small id="queuePosition">Estás en una fila de demostración.</small></div>`;
+    gate.innerHTML=`<span class="eyebrow">DUCKY VIRTUAL QUEUE</span><h2>La venta está abierta</h2><p>Entra a la fila virtual. Te mostraremos tu posición y el avance mientras esperas.</p><button class="cta" id="joinQueueBtn">ENTRAR A LA FILA VIRTUAL</button><div id="queueProgress" class="queue-progress hidden"><div class="queue-position-card"><strong id="queueNumber">50</strong><span>PERSONAS DELANTE DE TI</span></div><div class="queue-track"><i id="queueBar"></i></div><strong id="queueStatus">Preparando tu lugar…</strong><small id="queuePosition">Tu turno llegará en aproximadamente 1 minuto.</small></div>`;
     $("#bookingPanel").classList.add("hidden");
     $("#joinQueueBtn").onclick=()=>{
-      const btn=$("#joinQueueBtn");if(queueTimer)return;btn.disabled=true;$("#queueProgress").classList.remove("hidden");
-      queueSeconds=50;let remaining=50;
+      const btn=$("#joinQueueBtn");if(queueTimer)return;btn.disabled=true;btn.textContent="YA ESTÁS EN LA FILA";
+      $("#queueProgress").classList.remove("hidden");
+      let remaining=50;
+      const total=50;
+      $("#queueNumber").textContent=remaining;
       $("#queueStatus").textContent="Estás en la fila virtual…";
-      $("#queuePosition").textContent="Personas delante de ti: 50";
+      $("#queuePosition").textContent="Estamos preparando tu acceso. No cierres esta ventana.";
       $("#queueBar").style.width="0%";
+      // 50 posiciones avanzan cada 1.5 segundos: espera aproximada de 75 segundos.
       queueTimer=setInterval(()=>{
         remaining--;
-        const pct=((50-remaining)/50)*100;
+        const pct=((total-remaining)/total)*100;
         $("#queueBar").style.width=pct+"%";
+        $("#queueNumber").textContent=String(Math.max(remaining,0)).padStart(2,"0");
         $("#queuePosition").textContent=remaining>0
-          ? `Personas delante de ti: ${remaining}`
-          : "¡Ya no hay personas delante de ti!";
+          ? `Tu fila está avanzando · ${Math.round(pct)}% completado`
+          : "Ya no hay personas delante de ti.";
         if(remaining<=0){
           clearInterval(queueTimer);queueTimer=null;queuePassed[key]=true;
-          $("#queueStatus").textContent="¡Tu turno ha llegado!";
+          $("#queueNumber").textContent="00";
+          $("#queueStatus").textContent="¡TU TURNO HA LLEGADO!";
           $("#queuePosition").textContent="Ya puedes elegir tus accesos.";
-          setTimeout(()=>{gate.classList.add("hidden");$("#bookingPanel").classList.remove("hidden");},700);
+          setTimeout(()=>{gate.classList.add("hidden");$("#bookingPanel").classList.remove("hidden");},1200);
         }
-      },1000);
+      },1500);
     };
   }
   // Refresh countdowns and transition to virtual queue at exact sale opening.
