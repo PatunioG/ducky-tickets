@@ -55,3 +55,8 @@
 }
 
 .booking-column{min-width:0}.custom-map>path,.custom-map>text.stage-label{display:none}
+
+/* DUCKY TICKETS 5.0 secure admin login */
+#adminLoginModal .username-field{display:block;margin:14px 0;font-size:10px;font-weight:800;color:#59677a}
+#adminLoginModal .username-field input{display:block;width:100%;padding:12px;border:1px solid #dce3eb;border-radius:4px;margin-top:6px;font-size:12px}
+#adminLoginSubmit:disabled{opacity:.6;cursor:wait}

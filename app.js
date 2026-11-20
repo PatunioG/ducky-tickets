@@ -113,88 +113,16 @@ $("#confirmBooking").onclick=()=>{
 $$("[data-close]").forEach(b=>b.onclick=()=>modal(b.dataset.close,false));$$(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)modal(m.id,false)}));
 $("#year").textContent=new Date().getFullYear();
 
-/* ADMIN LOGIN — control aislado y con eventos directos */
+/* ADMIN LOGIN: autenticación segura gestionada por supabase-integration.js */
 const adminLoginButton = document.getElementById("openAdmin");
 const adminLoginModal = document.getElementById("adminLoginModal");
 const adminAppElement = document.getElementById("adminApp");
-const adminColorButtons = Array.from(document.querySelectorAll("#adminLoginModal .color-key"));
-const adminSlots = Array.from(document.querySelectorAll("#colorSlots i"));
-const adminErrorElement = document.getElementById("adminError");
-const adminClearButton = document.getElementById("clearColors");
-let adminColorInput = [];
-
-function paintAdminSlots(){
-  adminSlots.forEach((slot,index)=>{
-    const color=adminColorInput[index];
-    slot.classList.toggle("filled",Boolean(color));
-    slot.style.background=color || "transparent";
-  });
-}
-function resetAdminColors(message=""){
-  adminColorInput=[];
-  paintAdminSlots();
-  if(adminErrorElement) adminErrorElement.textContent=message;
-}
-function openAdminPanelLogin(event){
-  if(event){event.preventDefault();event.stopPropagation();}
-  resetAdminColors("");
-  if(adminLoginModal){
-    adminLoginModal.classList.remove("hidden");
-    adminLoginModal.style.display="grid";
-    adminLoginModal.setAttribute("aria-hidden","false");
-  }
-}
-if(adminLoginButton){
-  adminLoginButton.addEventListener("click",openAdminPanelLogin);
-}
-adminColorButtons.forEach(button=>{
-  button.addEventListener("click",(event)=>{
-    event.preventDefault();
-    event.stopPropagation();
-    if(adminColorInput.length>=SEQ.length)return;
-    adminColorInput.push(button.dataset.color);
-    paintAdminSlots();
-    if(adminColorInput.length===SEQ.length){
-      const valid=adminColorInput.every((color,index)=>color===SEQ[index]);
-      if(valid){
-        if(adminLoginModal){
-          adminLoginModal.classList.add("hidden");
-          adminLoginModal.style.display="none";
-          adminLoginModal.setAttribute("aria-hidden","true");
-        }
-        if(adminAppElement){
-          adminAppElement.classList.remove("hidden");
-          adminAppElement.style.display="grid";
-        }
-        if(typeof renderAdmin==="function") renderAdmin();
-        resetAdminColors("");
-      }else{
-        resetAdminColors("Secuencia incorrecta. Inténtalo de nuevo.");
-      }
-    }
-  });
-});
-if(adminClearButton){
-  adminClearButton.addEventListener("click",(event)=>{
-    event.preventDefault();
-    resetAdminColors("");
-  });
-}
 const adminExitButton=document.getElementById("exitAdmin");
 if(adminExitButton){
   adminExitButton.addEventListener("click",()=>{
-    if(adminAppElement){
-      adminAppElement.classList.add("hidden");
-      adminAppElement.style.display="none";
-    }
+    if(adminAppElement){adminAppElement.classList.add("hidden");adminAppElement.style.display="none";}
   });
 }
-document.querySelectorAll(".admin-tab").forEach(button=>{
-  button.addEventListener("click",()=>tab(button.dataset.tab));
-});
-document.querySelectorAll("[data-goto]").forEach(button=>{
-  button.addEventListener("click",()=>tab(button.dataset.goto));
-});
 function tab(t){
   document.querySelectorAll(".admin-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
   document.querySelectorAll(".admin-page").forEach(p=>p.classList.toggle("active",p.id==="tab-"+t));
@@ -230,7 +158,7 @@ function resetEventForm(){const f=$("#eventForm");f.reset();f.elements.id.value=
 $("#cancelEdit").onclick=resetEventForm;
 $("#eventForm").onsubmit=e=>{
  e.preventDefault();const f=e.currentTarget,d=new FormData(f),id=d.get("id");
- const obj={id:id||"event-"+Date.now(),name:d.get("name").trim(),date:d.get("date"),description:d.get("description").trim(),cover:d.get("cover").trim(),capacity:Number(d.get("capacity")),phase:d.get("phase"),published:d.get("phase")!=="hidden"};
+ const obj={id:id||crypto.randomUUID(),name:d.get("name").trim(),date:d.get("date"),description:d.get("description").trim(),cover:d.get("cover").trim(),capacity:Number(d.get("capacity")),phase:d.get("phase"),published:d.get("phase")!=="hidden"};
  if(!obj.name||!obj.date||!obj.description||!Number.isInteger(obj.capacity)||obj.capacity<1)return;
  if(id){const idx=db.events.findIndex(x=>x.id===id);if(idx>=0)db.events[idx]={...db.events[idx],...obj,published:obj.phase==="hidden"?false:(db.events[idx].published!==false)}}
  else db.events.unshift({...obj,createdAt:new Date().toISOString()});

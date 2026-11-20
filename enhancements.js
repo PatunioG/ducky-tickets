@@ -10,8 +10,8 @@
     available:"#efc34f", occupied:"#ed8a43", stage:"#111827",
     staff:"#9aa3ad", blocked:"#5d6672"
   };
-  const oldSave = save;
-  function persistVenues(){ localStorage.setItem(VENUE_KEY, JSON.stringify(venues)); }
+  const oldSave = ()=>save();
+  function persistVenues(){ localStorage.setItem(VENUE_KEY, JSON.stringify(venues)); if(window.duckyCloudSync) window.duckyCloudSync(); }
   function venueById(id){ return venues.find(v=>v.id===id); }
   function salePhase(e){
     const now=Date.now(), pre=e.presaleAt?new Date(e.presaleAt).getTime():null, gen=e.generalAt?new Date(e.generalAt).getTime():null;
@@ -283,11 +283,7 @@
     $("#staffAccessCode").value="";$("#staffLoginError").textContent="";modal("staffLoginModal");
   });
   $("#staffLoginSubmit").addEventListener("click",()=>{
-    const v=eventVenue(activeEvent());
-    if(v && v.staffCode && $("#staffAccessCode").value===v.staffCode){
-      staffSession=true;modal("staffLoginModal",false);$("#phaseNotice").textContent+=" · Sesión Staff activa";drawMap();
-      alert(`Sesión Staff iniciada. Precio especial configurado: $${Number(v.staffPrice||0).toFixed(2)} MXN (demostración, sin cobro integrado).`);
-    }else $("#staffLoginError").textContent="Clave incorrecta o no configurada para este recinto.";
+    $("#staffLoginError").textContent="El acceso Staff compartido requiere cuentas autenticadas independientes. Por seguridad, no se aceptan claves guardadas en el navegador en esta versión conectada.";
   });
 
   // Admin: extend navigation, scheduled event editor and CRUD.
@@ -325,7 +321,7 @@
     const phase=d.get("phase"),presaleAt=d.get("presaleAt"),generalAt=d.get("generalAt");
     if(phase==="scheduled" && (!presaleAt||!generalAt)){alert("Para programar el evento debes indicar fecha y hora de preventa y venta general.");return;}
     if(presaleAt&&generalAt&&new Date(generalAt)<=new Date(presaleAt)){alert("La venta general debe comenzar después de la preventa.");return;}
-    const obj={id:id||"event-"+Date.now(),name:d.get("name").trim(),date:d.get("date"),description:d.get("description").trim(),cover:d.get("cover").trim(),capacity:Number(d.get("capacity")),phase,published:phase!=="hidden",presaleAt:presaleAt||"",generalAt:generalAt||"",venueId:d.get("venueId")||""};
+    const obj={id:id||crypto.randomUUID(),name:d.get("name").trim(),date:d.get("date"),description:d.get("description").trim(),cover:d.get("cover").trim(),capacity:Number(d.get("capacity")),phase,published:phase!=="hidden",presaleAt:presaleAt||"",generalAt:generalAt||"",venueId:d.get("venueId")||""};
     if(!obj.name||!obj.date||!obj.description||!Number.isInteger(obj.capacity)||obj.capacity<1)return;
     if(id){const idx=db.events.findIndex(x=>x.id===id);if(idx>=0)db.events[idx]={...db.events[idx],...obj};}
     else db.events.unshift({...obj,createdAt:new Date().toISOString()});
@@ -334,7 +330,7 @@
 
   function createVenueDraft(){
     const f=$("#venueForm"),rows=Math.max(4,Math.min(30,Number(f.elements.rows.value)||12)),cols=Math.max(4,Math.min(36,Number(f.elements.cols.value)||20));
-    return {id:f.elements.id.value||"venue-"+Date.now(),name:f.elements.name.value.trim(),promoter:f.elements.promoter.value.trim(),status:f.elements.status.value,capacity:Number(f.elements.capacity.value)||rows*cols,gameLink:f.elements.gameLink.value.trim(),description:f.elements.description.value.trim(),staffCode:f.elements.staffCode.value.trim(),staffPrice:Number(f.elements.staffPrice.value)||0,rows,cols,cells:venueDraft&&venueDraft.rows===rows&&venueDraft.cols===cols?venueDraft.cells.slice():defaultCells(rows,cols)};
+    return {id:f.elements.id.value||crypto.randomUUID(),name:f.elements.name.value.trim(),promoter:f.elements.promoter.value.trim(),status:f.elements.status.value,capacity:Number(f.elements.capacity.value)||rows*cols,gameLink:f.elements.gameLink.value.trim(),description:f.elements.description.value.trim(),staffCode:f.elements.staffCode.value.trim(),staffPrice:Number(f.elements.staffPrice.value)||0,rows,cols,cells:venueDraft&&venueDraft.rows===rows&&venueDraft.cols===cols?venueDraft.cells.slice():defaultCells(rows,cols)};
   }
   function drawVenueEditor(){
     if(!venueDraft)return;
@@ -424,4 +420,10 @@
   renderVenues();
   renderMarket();
   renderAdmin();
+  window.duckyGetVenues=()=>venues;
+  window.duckySetVenues=(next)=>{venues=Array.isArray(next)?next:[];localStorage.setItem(VENUE_KEY,JSON.stringify(venues));renderVenues();updateVenueSelect();};
+  window.duckyGetSelectedSeats=()=>selectedSeats.slice();
+  window.duckyClearSelectedSeats=()=>{selectedSeats=[];selectedSection=null;qty=1;};
+  window.duckyIsStaffSession=()=>staffSession;
+  window.duckySalePhase=salePhase;
 })();
