@@ -132,7 +132,9 @@
     const phase=salePhase(e), target=nextSaleAt(e);
     const countdown=$("#saleCountdown");
     if(countdown)countdown.textContent=countdownText(target);
-    if((phase==="presale" || phase==="general") && $("#bookingPanel").classList.contains("hidden")){
+    // No reconstruir la pantalla mientras el usuario está esperando:
+    // hacerlo reemplazaba el contador cada segundo y parecía que desaparecía.
+    if((phase==="presale" || phase==="general") && $("#bookingPanel").classList.contains("hidden") && !queueTimer){
       drawQueueGate();
     }
     $("#phaseNotice").textContent=`${phaseLabel(e)}${eventVenue(e)?" · "+eventVenue(e).name:""}`;
